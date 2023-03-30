@@ -22,16 +22,16 @@ AuthorSchema.virtual("url").get(function () {
   return `/catalog/author/${this._id}`;
 });
 
-AuthorSchema.virtual("formatted_date_of_birth").get(function () {
-  return this.date_of_birth
+AuthorSchema.virtual("lifespan").get(function () {
+  const birth = this.date_of_birth
     ? DateTime.fromJSDate(this.date_of_birth).toLocaleString(DateTime.DATE_MED)
     : "";
-});
 
-AuthorSchema.virtual("formatted_date_of_death").get(function () {
-  return this.date_of_death
+  const death = this.date_of_death
     ? DateTime.fromJSDate(this.date_of_death).toLocaleString(DateTime.DATE_MED)
     : "";
+
+  return `${birth} - ${death}`;
 });
 
 module.exports = mongoose.model("Author", AuthorSchema);

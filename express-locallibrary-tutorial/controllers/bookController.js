@@ -48,14 +48,17 @@ exports.book_list = (req, res, next) => {
     });
 };
 
-// Display detail page for a spesific book
+/// Display detail page for a specific book.
 exports.book_detail = (req, res, next) => {
   async.parallel(
     {
       book(callback) {
-        Book.findById(req.params.id).exec(callback);
+        Book.findById(req.params.id)
+          .populate("author")
+          .populate("genre")
+          .exec(callback);
       },
-      book_insance(callback) {
+      book_instance(callback) {
         BookInstance.find({ book: req.params.id }).exec(callback);
       },
     },
@@ -63,16 +66,17 @@ exports.book_detail = (req, res, next) => {
       if (err) {
         return next(err);
       }
-      if (!results.book) {
-        // No results
-        const err = new Error("Book Not Found");
-        err.status(404);
+      if (results.book == null) {
+        // No results.
+        const err = new Error("Book not found");
+        err.status = 404;
         return next(err);
       }
+      // Successful, so render.
       res.render("book_detail", {
         title: results.book.title,
         book: results.book,
-        book_insances: results.book_insance,
+        book_instances: results.book_instance,
       });
     }
   );
