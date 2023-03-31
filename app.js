@@ -8,12 +8,21 @@ require("dotenv").config();
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const catalogRouter = require("./routes/catalog");
+const compression = require("compression");
+const helmet = require("helmet");
 
 const app = express();
 
+// Set up rate limiter: maximum of twenty requests per minute
+var RateLimit = require("express-rate-limit");
+var limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
-const mongoDB = process.env.URI;
+const mongoDB = process.env.MONGODB_URI;
 
 async function main() {
   await mongoose.connect(mongoDB);
@@ -28,6 +37,9 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(limiter);
+app.use(helmet());
+app.use(compression());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
