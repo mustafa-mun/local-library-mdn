@@ -22,7 +22,7 @@ var limiter = RateLimit({
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
-const mongoDB = process.env.MONGODB_URI;
+const mongoDB = process.env.MONGODB_URI || URI;
 
 async function main() {
   await mongoose.connect(mongoDB);
